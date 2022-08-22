@@ -2,6 +2,7 @@ const STORAGE_NAME = 'todo_apps';
 const SAVED_EVENT = 'save_data';
 const RENDER_EVENT = 'render_data';
 let todos = [];
+let tempTodos = [];
 
 function isStorageExist() {
   if (typeof (Storage) !== undefined) return true;
@@ -91,9 +92,12 @@ function loadDataStorage() {
   if (todoSaved == null) return;
 
   todos = [];
+  tempTodos = [];
   todoSaved.map((data) => {
     todos.push(data);
+    tempTodos.push(data);
   });
+
 
   document.dispatchEvent(new Event(RENDER_EVENT));
 }
@@ -130,11 +134,12 @@ function toggleCompleteStatus(id, status) {
   const todoData = findData(id);
 
   if(todoData == null || todoData === undefined) return;
-
+  
+  todos = tempTodos;
   todoData.is_complete = !status;
   removeFromData(id);
   todos.push(todoData);
-  saveToLocalStorage();
+  saveToLocalStorage();  
 }
 
 function searchFromStorage() {
@@ -144,13 +149,12 @@ function searchFromStorage() {
     const searchTitle = todos.find((data) => {
       return data.title == searchInput;
     });
-  
+    
     todos = [];
     todos.push(searchTitle);    
   } else {
     loadDataStorage();
   }
-
 
   document.dispatchEvent(new Event(RENDER_EVENT));
 }
@@ -198,5 +202,6 @@ document.addEventListener(RENDER_EVENT, () => {
       incompleteContainer.append(todoElement);
     }
   });
-})
+});
+
 //#endregion logging
